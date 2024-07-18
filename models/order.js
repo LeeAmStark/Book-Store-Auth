@@ -32,4 +32,4 @@ const cartSchema = new mongoose.Schema({
     },
 });
 
-const cartProduct = mongoose.model('cartProducts', cartSchema);
+const orderProduct = mongoose.model('orderProduct', cartSchema);
