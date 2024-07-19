@@ -1,4 +1,5 @@
 const express = require("express");
+const Product = require("../../models/products");
 
 const routes = express.Router();
 
@@ -8,14 +9,14 @@ routes.post("/create-product", async (req, res) => {
     try {
         const products = await Product.create({ name, description, price, category, brand, createdAt });
         console.log(products);
-        res.send(products.name + " :has been added to the store");
+        res.status(201).send(products.name + " has been added to the store");
     } catch (error) {
-        res.status(400).json(error.message);
+        res.status(400).json({ error: error.message });
     }
-})
+});
 
 routes.get("/find-product", async (req, res) => {
-    const { id, name, description, price, category } = req.body;
+    const { id, name, description, price, category } = req.query;
     try {
         let query = {};
 
@@ -44,31 +45,31 @@ routes.get("/find-product", async (req, res) => {
 routes.put("/update-product", async (req, res) => {
     const { id, name, description, price, category, createdAt } = req.body;
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, category, createdAt }, { new: true, upsert: true })
+        const updatedProduct = await Product.findByIdAndUpdate(id, { name, description, price, category, createdAt }, { new: true, upsert: true });
         if (!updatedProduct) {
             return res.status(404).send('Product not found');
         }
         console.log(updatedProduct);
-        res.json(updatedProduct)
-    }
-    catch (err) {
+        res.json(updatedProduct);
+    } catch (err) {
         console.error(err.message);
         res.status(500).send('Error updating product');
     }
-})
+});
 
-routes.get("/delete-product", async (req, res) => {
+routes.delete("/delete-product", async (req, res) => {
     const { id } = req.body;
     try {
-        const deleteProduct = await Product.findByIdAndDelete(id)
-        if (!deleteProduct) {
+        const deletedProduct = await Product.findByIdAndDelete(id);
+        if (!deletedProduct) {
             return res.status(404).send('Product not found');
         }
-        console.log(deleteProduct);
-        res.json(deleteProduct)
-    }
-    catch (err) {
+        console.log(deletedProduct);
+        res.json(deletedProduct);
+    } catch (err) {
         console.error(err.message);
-        res.status(500).send('Error updating product');
+        res.status(500).send('Error deleting product');
     }
-})
+});
+
+module.exports = routes;

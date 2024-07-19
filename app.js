@@ -1,42 +1,61 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
+const Mongo_Uri = process.env.MONGO_URI;
 const bCrypt = require('bcrypt');
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const port = 3000;
+const app = express();
+
+
+// Middleware
+app.use(express.static('public'));
+app.use(express.json());
+app.use(cors());
+app.use(express.json());
+
+// Connect to MongoDB with the specified connection string
+const CONNECTION_URL = Mongo_Uri;
+mongoose
+  .connect(CONNECTION_URL)
+  .then(() => {
+    console.log("MONGODB CONNECTED SUCCESSFULLY!");
+  })
+  .catch((error) => {
+    console.log("Error connecting to MongoDB:", error.message);
+  });
 
 // FUNCTION ROUTES IMPORT
 const storeAuth = require("./routes/auth/index");
-const storeCart = require("./routes/carts/cart");
-const storeProducts = require("./routes/products/products");
-
-const app = express();
+const cartHouse = require("./routes/carts/cart");
+const productRoute = require("./routes/products/products");
 
 const { addUser, getUsers, getUser, handleErrors } = require('./User_DataStore');
 const User = require('./models/user');
 const Product = require('./models/products');
 const Order = require('./models/order');
 const cartProduct = require("./models/cart");
+const { render } = require('ejs');
 
-// Middleware
-app.use(express.static('public'));
-app.use(express.json());
+app.get('/', (req, res) => {
+  res.send('This is working');
+})
 
 // USER SIGN UP AND LOG IN --------------------------------------------------------------------------
-app.post("/auth/login", storeAuth);
-app.post("/auth/register", storeAuth);
+app.use("/auth/login", storeAuth);
+app.use("/auth/register", storeAuth);
 
 // PRODUCTS CREATION AND MODIFICATION
-app.post("/products/find-product", storeProducts);
-app.post("/products/update-product", storeProducts);
-app.post("/products/delete-product", storeProducts);
+app.use("/product/find-product", productRoute);
+app.use("/product/update-product", productRoute);
+app.use("/product/delete-product", productRoute);
 
 // PRODUCTS TO CART MODIFICATION --------------------------------------------------------------------
-app.post("/cart/add-to-cart", storeCart);
-app.post("/cart/remove-from-cart", storeCart);
+app.use("/cart/add-to-cart", cartHouse);
+app.use("/cart/add-to-cart", cartHouse);
 
 // ORDERS MADE -------------------------------------------------------------------------------------
-
 app.get("/make-order", async (req, res) => {
   const { id } = req.body;
 
@@ -66,20 +85,7 @@ app.get("/make-order", async (req, res) => {
   }
 });
 
-app.post("/payment-details", async (req, res) => {
-})
-
-// Connect to MongoDB with the specified connection string
-const CONNECTION_URL = 'mongodb+srv://Liam:Stark404@book-storeauth.tjhllrf.mongodb.net/?retryWrites=true&w=majority&appName=Book-StoreAuth';
-mongoose
-  .connect(CONNECTION_URL)
-  .then(() => {
-    console.log("MONGODB CONNECTED SUCCESSFULLY!");
-  })
-  .catch((error) => {
-    console.log("Error connecting to MongoDB:", error.message);
-  });
-
-app.listen(port, () => {
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

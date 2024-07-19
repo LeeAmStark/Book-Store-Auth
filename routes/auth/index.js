@@ -1,6 +1,6 @@
 const express = require("express");
-
 const routes = express.Router();
+
 
 // Login route
 routes.post("/signup", async (req, res) => {
@@ -36,4 +36,4 @@ routes.post("/signup", async (req, res) => {
     }
   });
 
-  
+  module.exports = routes;
