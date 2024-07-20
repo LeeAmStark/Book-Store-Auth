@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const { isEmail } = require(('validator'));
 
-// handle errors
-const handleErrors = (err) => {
-    console.log(err.message, err.code);
-}
-
 const userSchema = new mongoose.Schema({
     token: {
         type: String

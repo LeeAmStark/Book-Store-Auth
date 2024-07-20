@@ -3,16 +3,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Mongo_Uri = process.env.MONGO_URI;
 const bCrypt = require('bcrypt');
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
+const cors = require("cors"); // Install cors, npm i cors
 const port = 3000;
 const app = express();
-
 
 // Middleware
 app.use(express.static('public'));
 app.use(express.json());
-app.use(cors());
+app.use(cors()); // Make the NodeJS use cors - middleware shit
 app.use(express.json());
 
 // Connect to MongoDB with the specified connection string
@@ -31,20 +29,19 @@ const storeAuth = require("./routes/auth/index");
 const cartHouse = require("./routes/carts/cart");
 const productRoute = require("./routes/products/products");
 
-const { addUser, getUsers, getUser, handleErrors } = require('./User_DataStore');
-const User = require('./models/user');
 const Product = require('./models/products');
 const Order = require('./models/order');
 const cartProduct = require("./models/cart");
 const { render } = require('ejs');
 
-app.get('/', (req, res) => {
-  res.send('This is working');
+app.get('/', (req, res) => { // This here is to tell us our frontend has connected to our backend
+  console.log('Back-End Connected');
+  res.send('Back-End Connected');
 })
 
 // USER SIGN UP AND LOG IN --------------------------------------------------------------------------
-app.use("/auth/login", storeAuth);
-app.use("/auth/register", storeAuth);
+app.use("/auth", storeAuth);
+app.use("/auth", storeAuth);
 
 // PRODUCTS CREATION AND MODIFICATION
 app.use("/product/find-product", productRoute);
