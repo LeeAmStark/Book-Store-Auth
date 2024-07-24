@@ -44,7 +44,7 @@ routes.post("/signup", async (req, res) => {
   }
 });
 
-routes.post('/login', async (req, res) => {
+routes.get('/login', async (req, res) => {
   try {
     const { email, username, password } = req.body;
 
@@ -52,25 +52,34 @@ routes.post('/login', async (req, res) => {
       return res.status(400).json("Input your username or email and password");
     }
 
-    const userExists = await User.findOne({ email, username });
+    const userExists = await User.findOne({ email });
+    const emailExists = await User.findOne({ username });
 
-    if (!userExists) {
-      console.log(userExists)
-      return res.status(400).json("User doesn't exist");
+    if (!userExists && emailExists) {
+      alert("User doesn't match email")
+      return res.status(400).json("User doesn't match email");
+    }
+
+    if (!emailExists && userExists) {
+      alert("Email doesn't match username")
+      return res.status(400).json("Email doesn't match username");
+    }
+
+    else if(!emailExists && !userExists){
+      alert("Account doesn't exist");
+      return res.status(400).json("Account doesn't exist");
     }
 
     const passwordValid = await bCrypt.compare(password, userExists.password);
     if (!passwordValid) {
       console.log("password not correct")
-      return res.status(400).json("Your password is incorrect");
+      return res.status(400).json({ success: false, message: "Your password is incorrect" });
     }
-    let logTimer = setTimeout(navigate("/home"));
-    alert(`You'll be logged in - ${logTimer}`)
-    console.log("Logging in")
-    return res.status(200).json("Logging in");
+    console.log("Logging in");
+    res.status(201).json({ success: true, message: 'User registered successfully.' });
   } catch (err) {
-    res.status(500).send(err);
-    console.log(err);
+    console.log(err.message);
+    return err;
   }
 });
 
