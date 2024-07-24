@@ -9,6 +9,7 @@ const bCrypt = require('bcrypt');
 routes.post("/signup", async (req, res) => {
   const { email, username, password, token } = req.body;
   try {
+    
     const existingUser = await User.findOne({ email });
     let id;
 
@@ -44,42 +45,35 @@ routes.post("/signup", async (req, res) => {
   }
 });
 
-routes.get('/login', async (req, res) => {
+routes.post('/login', async (req, res) => {
   try {
     const { email, username, password } = req.body;
 
-    if (!email || !username && !password) {
-      return res.status(400).json("Input your username or email and password");
+    if (!email || !password) {
+      return res.status(400).json("Input your email and password");
     }
 
-    const userExists = await User.findOne({ email });
-    const emailExists = await User.findOne({ username });
+    const user = await User.findOne({ username });
+    const e_mail = await User.findOne({email});
 
-    if (!userExists && emailExists) {
-      alert("User doesn't match email")
-      return res.status(400).json("User doesn't match email");
+    if (!user) {
+      return res.status(400).json("User doesn't exist");
+    }else if(!e_mail){
+      return res.status(400).json("Email doesn't exist");
     }
 
-    if (!emailExists && userExists) {
-      alert("Email doesn't match username")
-      return res.status(400).json("Email doesn't match username");
-    }
-
-    else if(!emailExists && !userExists){
-      alert("Account doesn't exist");
-      return res.status(400).json("Account doesn't exist");
-    }
-
-    const passwordValid = await bCrypt.compare(password, userExists.password);
+    const passwordValid = await bCrypt.compare(password, user.password);
     if (!passwordValid) {
-      console.log("password not correct")
-      return res.status(400).json({ success: false, message: "Your password is incorrect" });
+      return res.status(400).json("Your password is incorrect");
     }
-    console.log("Logging in");
-    res.status(201).json({ success: true, message: 'User registered successfully.' });
+
+    // Generate token
+    const token = jwt.sign({ _id: user._id }, "your_secret_key", { expiresIn: '1h' });
+
+    res.status(200).json({ success: true, message: "Logged in successfully", token });
   } catch (err) {
     console.log(err.message);
-    return err;
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
