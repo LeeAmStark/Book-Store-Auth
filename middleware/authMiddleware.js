@@ -9,7 +9,7 @@ const requireAuth = (req, res, next) => {
         console.log(err.message);
         return res.status(401).json({ success: false, message: "Unauthorized" });
       } else {
-        req.user = decodedToken;
+        req.user = decodedToken;  
         next();
       }
     });
