@@ -22,7 +22,7 @@ routes.post("/signup", async (req, res) => {
     await user.save();
 
     // Generate JWT
-    const token = jwt.sign({ id: user._id, username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, username: user.username }, process.env.SECRET_KEY, { expiresIn: '10s' });
     user.token = token;
     await user.save();
 
@@ -61,7 +61,7 @@ routes.post('/login', async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ id: user._id, username: user.username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, username: user.username }, process.env.SECRET_KEY, { expiresIn: '10s' });
 
     res.status(200).json({ success: true, message: "Logged in successfully", token });
   } catch (err) {
