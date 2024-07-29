@@ -50,7 +50,6 @@ app.use("/product/delete-product", productRoute);
 
 // PRODUCTS TO CART MODIFICATION --------------------------------------------------------------------
 app.use("/cart/add-to-cart", cartHouse);
-app.use("/cart/add-to-cart", cartHouse);
 
 // ORDERS MADE -------------------------------------------------------------------------------------
 app.get("/make-order", async (req, res) => {
